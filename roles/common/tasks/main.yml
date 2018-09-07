@@ -1,0 +1,39 @@
+---
+# timezone 
+- name: set timezone to Asia/Tokyo
+  timezone: 
+    name: Asia/Tokyo
+
+# add repository
+- name: add epel repository
+  yum: name={{ item }}
+  with_items:
+    - epel-release
+    
+# disable epel for defoult repository
+- name: disable epel for default
+  replace: dest=/etc/yum.repos.d/{{item}} regexp="enabled *= *1" replace="enabled=0"
+  with_items:
+    - epel.repo
+
+# selinux 
+- name: disable selinux
+  selinux:
+    policy: targeted
+    state: disabled
+
+# firewalld
+- name: check firewalld is running
+  command: systemctl is-active firewalld
+  register: firewalld_result
+  changed_when: False
+  ignore_errors: True
+
+# package-install
+- name: install packages
+  yum: 
+    name: "{{ item }}"
+    state: latest
+  with_items: 
+    - git
+    - vim

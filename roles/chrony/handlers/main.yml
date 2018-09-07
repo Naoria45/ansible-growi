@@ -1,0 +1,7 @@
+---
+# handlers file for chrony
+- name: restart chrony
+  systemd:
+    name: chronyd
+    state: restarted
+    enabled: yes

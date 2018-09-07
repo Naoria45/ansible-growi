@@ -1,0 +1,9 @@
+---
+- hosts: prod-growi
+  become: yes
+  vars_files:
+    - ./vars/main.yml
+  roles: 
+    - common
+    - chrony
+    - growi

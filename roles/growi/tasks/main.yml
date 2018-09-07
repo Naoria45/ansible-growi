@@ -1,0 +1,53 @@
+---
+
+- name: install nodesource repo
+  shell: curl --silent --location https://rpm.nodesource.com/setup_8.x | bash -
+
+- name: install node 8.x and npm 5.x
+  yum: 
+    name: nodejs
+    state: latest
+  
+- name: install yarnpkg repo
+  shell: curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo | sudo tee /etc/yum.repos.d/yarn.repo
+
+- name: install yarn
+  yum: 
+    name: yarn
+    state: latest
+
+- name: add mongodb repo
+  yum_repository:
+    name: mongodb-org-3.6
+    description: MongoDB Repository
+    baseurl: https://repo.mongodb.org/yum/redhat/7Server/mongodb-org/3.6/x86_64
+    gpgcheck: yes
+    gpgkey: https://www.mongodb.org/static/pgp/server-3.6.asc
+    enabled: yes
+
+- name: install mongodb 3.x
+  yum:
+    name: mongodb-org
+    state: latest
+
+#- name: install elastic search
+
+- name: git clone 
+  git: 
+    repo: https://github.com/weseek/growi.git
+    dest: "{{ install_dir }}"
+
+- name: yarn
+  shell: yarn
+  args:
+    chdir: "{{ install_dir }}"
+
+- name: start mongod
+  systemd:
+    name: mongod
+    state: started 
+
+- name: connect mongo
+  shell: MONGO_URI=mongodb://localhost:27017/growi npm start
+  args:
+    chdir: "{{ install_dir }}"

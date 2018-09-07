@@ -1,0 +1,24 @@
+---
+# install chrony ntp server
+- name: install chrony
+  yum: 
+    name: chrony
+    state: latest
+
+- name: comment out default servers
+  replace: 
+    path: /etc/chrony.conf
+    regexp: '^(server \d+.centos.pool.ntp.org iburst)'
+    replace: '# \1'
+
+- name: add jst servers
+  blockinfile:
+    dest: /etc/chrony.conf
+    state: present
+    content: |
+
+      # ntp servers
+      server ntp.jst.mfeed.ad.jp iburst
+      server ntp.nict.jp iburst
+
+  notify: restart chrony
