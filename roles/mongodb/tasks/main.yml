@@ -32,77 +32,77 @@
     state: started
     enabled: yes
 
-- name: install python-pip
-  yum:
-    name: python-pip
-    enablerepo: epel
-    state: latest
-
-- name: install pymongo
-  pip: 
-    name: pymongo
-    # mongodb_user bugs Workaround.
+#- name: install python-pip
+#  yum:
+#    name: python-pip
+#    enablerepo: epel
+#    state: latest
+#
+#- name: install pymongo
+#  pip: 
+#    name: pymongo
+#    # mongodb_user bugs Workaround.
     # https://github.com/ansible/ansible/issues/34153
-- name: MongoDB Disabled Auth
-  replace:
-    dest: /etc/mongod.conf
-    regexp: '^security:'
-    replace: '#security:'
-
-- name: MongoDB Disabled Auth2
-  lineinfile:
-    dest: /etc/mongod.conf
-    state: absent
-    insertafter: '^security:'
-    line: '  authorization: enabled'
-
-- name: MongoDB Restart
-  systemd:
-    name: mongod
-    state: restarted
-
-- name: MongoDB Add User admin
-  mongodb_user:
-    database: admin
-    name: admin
-    password: password
-    roles: userAdminAnyDatabase
-    state: present
-
-- name: MongoDB Add User root
-  mongodb_user:
-    database: admin
-    name: root
-    password: password
-    roles: root
-    state: present
-
-- name: MongoDB Add User growi
-  mongodb_user:
-    login_user: admin
-    login_password: password
-    database: growi
-    name: growi
-    password: password
-    roles: readWrite
-    state: present
-
-- name: MongoDB Enabled Auth
-  replace:
-    dest: /etc/mongod.conf
-    regexp: '^#security:'
-    replace: 'security:'
-
-- name: MongoDB Enabled Auth2
-  lineinfile:
-    dest: /etc/mongod.conf
-    state: present
-    insertafter: '^security:'
-    line: '  authorization: enabled'
-
-- name: MongoDB Restart
-  systemd:
-    name: mongod
-    state: restarted
-
-
+#- name: MongoDB Disabled Auth
+#  replace:
+#    dest: /etc/mongod.conf
+#    regexp: '^security:'
+#    replace: '#security:'
+#
+#- name: MongoDB Disabled Auth2
+#  lineinfile:
+#    dest: /etc/mongod.conf
+#    state: absent
+#    insertafter: '^security:'
+#    line: '  authorization: enabled'
+#
+#- name: MongoDB Restart
+#  systemd:
+#    name: mongod
+#    state: restarted
+#
+#- name: MongoDB Add User admin
+#  mongodb_user:
+#    database: admin
+#    name: admin
+#    password: password
+#    roles: userAdminAnyDatabase
+#    state: present
+#
+#- name: MongoDB Add User root
+#  mongodb_user:
+#    database: admin
+#    name: root
+#    password: password
+#    roles: root
+#    state: present
+#
+#- name: MongoDB Add User growi
+#  mongodb_user:
+#    login_user: admin
+#    login_password: password
+#    database: growi
+#    name: growi
+#    password: password
+#    roles: readWrite
+#    state: present
+#
+#- name: MongoDB Enabled Auth
+#  replace:
+#    dest: /etc/mongod.conf
+#    regexp: '^#security:'
+#    replace: 'security:'
+#
+#- name: MongoDB Enabled Auth2
+#  lineinfile:
+#    dest: /etc/mongod.conf
+#    state: present
+#    insertafter: '^security:'
+#    line: '  authorization: enabled'
+#
+#- name: MongoDB Restart
+#  systemd:
+#    name: mongod
+#    state: restarted
+#
+#

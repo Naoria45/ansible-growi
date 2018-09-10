@@ -20,17 +20,17 @@
   npm:
     name: yarn
     global: yes
-    path: /opt/
+    path: /usr/local/bin
 
 - name: git clone 
   git: 
     repo: https://github.com/weseek/growi.git
-    dest: /opt/growi/
+    dest: "{{ growi_install_dir }}"
 
 - name: yarn
   shell: yarn
   args:
-    chdir: /opt/growi/
+    chdir: "{{ growi_install_dir}}"
 
 - name: Add Growi Service
   shell:
@@ -38,10 +38,10 @@
       cat << 'EOF' | tee /etc/systemd/system/growi.service
       [Unit]
       Description=Growi
-      After=network.target
+      After=network.target mongod.service
       
       [Service]
-      WorkingDirectory=/opt/growi
+      WorkingDirectory={{ growi_install_dir }}
       EnvironmentFile=/etc/systemd/system/growi.conf
       ExecStart=/usr/bin/npm start
 
@@ -54,7 +54,7 @@
     cmd: |
       cat << 'EOF' | tee  /etc/systemd/system/growi.conf
       PORT=3000
-      MONGO_URI="mongodb://growi:password@localhost/growi"
+      MONGO_URI="mongodb://localhost:27017/growi"
       ELASTICSEARCH_URI="http://localhost:9200"
       EOF
 
@@ -64,3 +64,10 @@
     daemon_reload: yes
     enabled: yes
     state: started
+
+- name: firewall 3000 port open
+  firewalld:
+    port: 3000/tcp
+    permanent: true
+    state: enabled
+    immediate: yes
