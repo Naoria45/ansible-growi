@@ -1,0 +1,50 @@
+---
+- name: import elasticsearch GPG-KEY
+  rpm_key:
+    state: present
+    key: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+
+- name: add elasticsearch repo
+  yum_repository:
+    name: elasticsearch5.x
+    description: Elasticsearch repository for 5.x packages
+    baseurl: https://artifacts.elastic.co/packages/5.x/yum 
+    gpgkey: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    gpgcheck: yes
+    enabled: yes 
+
+- name: install elasticsearch
+  yum: name=elasticsearch
+
+- name: Install OpenJDK 1.8
+  yum: name=java-1.8.0-openjdk.x86_64
+
+- name: Install analysis-kuromoji
+  elasticsearch_plugin:
+    name: analysis-kuromoji
+    state: present
+
+- name: Install analysis-icu
+  elasticsearch_plugin:
+    name: analysis-icu
+    state: present
+
+- name: Setting ElasticSearch MemoryUsage
+  replace:
+    dest: /etc/elasticsearch/jvm.options
+    regexp: '{{ item.regexp }}'
+    replace: '{{ item.replace }}'
+  with_items:
+  - regexp: '^-Xms2g'
+    replace: '-Xms512m'
+  - regexp: '^-Xmx2g'
+    replace: '-Xmx512m'
+
+- name: ElasticSearch Start and Enable
+  systemd:
+    name: elasticsearch
+    daemon_reload: yes
+    enabled: yes
+    state: started
+
+

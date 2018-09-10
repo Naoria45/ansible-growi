@@ -6,4 +6,7 @@
   roles: 
     - common
     - chrony
+    - mongodb
+    - nginx
+    - elasticsearch
     - growi

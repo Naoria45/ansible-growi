@@ -1,0 +1,108 @@
+---
+
+- name: add mongodb repo
+  yum_repository:
+    name: mongodb-org-3.6
+    description: MongoDB Repository
+    baseurl: https://repo.mongodb.org/yum/redhat/7Server/mongodb-org/3.6/x86_64
+    gpgkey: https://www.mongodb.org/static/pgp/server-3.6.asc
+    gpgcheck: yes
+    enabled: yes
+
+- name: install mongodb 3.x
+  yum:
+    name: mongodb-org
+    state: latest
+
+- name: install policycoreutils-python
+  yum:  
+    name: policycoreutils-python
+    state: latest
+
+- name: selinux setting for mongodb
+  seport:
+    ports: 27017
+    proto: tcp
+    setype: mongod_port_t
+    state: present
+
+- name: mongodb start
+  systemd:
+    name: mongod
+    state: started
+    enabled: yes
+
+- name: install python-pip
+  yum:
+    name: python-pip
+    enablerepo: epel
+    state: latest
+
+- name: install pymongo
+  pip: 
+    name: pymongo
+    # mongodb_user bugs Workaround.
+    # https://github.com/ansible/ansible/issues/34153
+- name: MongoDB Disabled Auth
+  replace:
+    dest: /etc/mongod.conf
+    regexp: '^security:'
+    replace: '#security:'
+
+- name: MongoDB Disabled Auth2
+  lineinfile:
+    dest: /etc/mongod.conf
+    state: absent
+    insertafter: '^security:'
+    line: '  authorization: enabled'
+
+- name: MongoDB Restart
+  systemd:
+    name: mongod
+    state: restarted
+
+- name: MongoDB Add User admin
+  mongodb_user:
+    database: admin
+    name: admin
+    password: password
+    roles: userAdminAnyDatabase
+    state: present
+
+- name: MongoDB Add User root
+  mongodb_user:
+    database: admin
+    name: root
+    password: password
+    roles: root
+    state: present
+
+- name: MongoDB Add User growi
+  mongodb_user:
+    login_user: admin
+    login_password: password
+    database: growi
+    name: growi
+    password: password
+    roles: readWrite
+    state: present
+
+- name: MongoDB Enabled Auth
+  replace:
+    dest: /etc/mongod.conf
+    regexp: '^#security:'
+    replace: 'security:'
+
+- name: MongoDB Enabled Auth2
+  lineinfile:
+    dest: /etc/mongod.conf
+    state: present
+    insertafter: '^security:'
+    line: '  authorization: enabled'
+
+- name: MongoDB Restart
+  systemd:
+    name: mongod
+    state: restarted
+
+

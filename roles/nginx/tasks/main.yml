@@ -1,0 +1,47 @@
+---
+# installing nginx
+
+- name: add nginx repo
+  yum_repository:
+    name: nginx
+    description: Nginx Repository
+    baseurl: http://nginx.org/packages/centos/$releasever/$basearch/
+    gpgcheck: no
+    enabled: yes
+
+- name: install nginx
+  yum: name=nginx
+
+- name: add nginx config for growi
+  shell:
+    cmd: |
+      cat << 'EOF' | tee  /etc/nginx/conf.d/growi.conf
+      server {
+       listen 80;
+       access_log /var/log/nginx/growi.log;
+       error_log /var/log/nginx/growi.log;
+       location / {
+         proxy_pass http://localhost:3000/;
+       }
+      }
+      EOF
+
+- name: SELinux httpd_can_network_connect ON
+  seboolean:
+    name: httpd_can_network_connect
+    state: yes
+    persistent: yes
+
+- name: nginx start and enable
+  systemd:
+    name: nginx
+    enabled: yes
+    state: started
+
+- name: firewlld open http
+  firewalld:
+    service: http
+    permanent: true
+    state: enabled
+    immediate: true
+

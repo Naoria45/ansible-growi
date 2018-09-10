@@ -16,12 +16,6 @@
   with_items:
     - epel.repo
 
-# selinux 
-- name: disable selinux
-  selinux:
-    policy: targeted
-    state: disabled
-
 # firewalld
 - name: check firewalld is running
   command: systemctl is-active firewalld
