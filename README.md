@@ -1,7 +1,5 @@
 # ansible-growi
 
-underconstruction
-
 Ansible playbook for GROWI on CentOS7
 
 **GROWI Official site is https://docs.growi.org/**
